@@ -1,43 +1,46 @@
-import { gql, useQuery } from '@apollo/client';
-import Head from 'next/head';
-import Image from 'next/image';
-import styles from '../styles/Home.module.css';
+import { gql, useQuery } from '@apollo/client'
+import Head from 'next/head'
+import Image from 'next/image'
+import styles from '../styles/Home.module.css'
 
 const GET_POSTS = gql`
   query GetPosts {
-  posts {
-    edges {
-      node {
-        id
-        title
-        author {
-          node {
-            firstName
-            lastName
+    posts {
+      edges {
+        node {
+          id
+          title
+          author {
+            node {
+              firstName
+              lastName
+            }
           }
-        }
-        excerpt(format: RAW)
-        slug
-        content(format: RENDERED)
-        featuredImage {
-          node {
-            uri
+          excerpt(format: RAW)
+          slug
+          content(format: RENDERED)
+          featuredImage {
+            node {
+              uri
+            }
           }
         }
       }
     }
   }
-}
-`;
+`
 
 export default function Home() {
-    const { loading, error, data } = useQuery(GET_POSTS);
- if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  const { loading, error, data } = useQuery(GET_POSTS)
+  if (loading) return <p>Loading...</p>
+  if (error) return <p>Error :(</p>
 
-    const useEffect = () => ( () => {
+  const useEffect = () => (
+    () => {
       console.log(data)
-    }, [data])
+    },
+    [data]
+  )
   return (
     <div className={styles.container}>
       <Head>
@@ -46,17 +49,23 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Posts
-        </h1>
+      {data && (
+        <main className={styles.main}>
+          <h1 className={styles.title}>Posts</h1>
 
-        <div className={styles.grid}>
-          {data?.posts?.edges?.map(item => <div className={styles.card}><h2>{item.node.title}</h2></div>)
-}
-
-        </div>
-      </main>
+          <div className={styles.grid}>
+            {data?.posts?.edges?.map((item) => (
+              <div key={item?.node?.id} className={styles.card}>
+                {/* Make this a link to the single post page */}
+                <h2>{item?.node?.title}</h2>
+                <p
+                  dangerouslySetInnerHTML={{ __html: item?.node?.content }}
+                ></p>
+              </div>
+            ))}
+          </div>
+        </main>
+      )}
 
       <footer className={styles.footer}>
         <a
