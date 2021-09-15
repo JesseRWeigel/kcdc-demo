@@ -1,29 +1,10 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import client from '../../apollo-client'
 import styles from '../../styles/Home.module.css'
-
-export default function Post() {
-  const router = useRouter()
-  const [slug, setSlug] = useState()
-  useEffect(() => {
-    setSlug(router.query.slug)
-  }, [router])
-
-  const GET_POST = gql`
-    query GetPost {
-      postBy(slug: "${slug}") {
-        content(format: RENDERED)
-        title(format: RENDERED)
-      }
-    }
-  `
-  const { loading, error, data } = useQuery(GET_POST)
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error :(</p>
-
+import { GET_POSTS } from '../index'
+export default function Post({ data }) {
   return (
     <div className={styles.container}>
       <Head>
@@ -53,4 +34,30 @@ export default function Post() {
       </footer>
     </div>
   )
+}
+export async function getStaticProps({ params, preview = false, previewData }) {
+  const { data } = await client.query({
+    query: gql`query GetPost {
+      postBy(slug: "${params.slug}") {
+        content(format: RENDERED)
+        title(format: RENDERED)
+      }
+    }`,
+  })
+
+  return {
+    props: {
+      data,
+    },
+  }
+}
+
+export async function getStaticPaths() {
+  const allPosts = await client.query({ query: GET_POSTS })
+  console.log(allPosts)
+  return {
+    paths:
+      allPosts?.posts?.edges?.map(({ node }) => `/post/${node.slug}`) || [],
+    fallback: true,
+  }
 }

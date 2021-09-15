@@ -1,10 +1,10 @@
-import { gql, useQuery } from '@apollo/client'
+import { gql } from '@apollo/client'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import client from '../apollo-client'
 import styles from '../styles/Home.module.css'
-
-const GET_POSTS = gql`
+export const GET_POSTS = gql`
   query GetPosts {
     posts {
       edges {
@@ -35,11 +35,7 @@ const GET_POSTS = gql`
   }
 `
 
-export default function Home() {
-  const { loading, error, data } = useQuery(GET_POSTS)
-  if (loading) return <p>Loading...</p>
-  if (error) return <p>Error :(</p>
-
+export default function Home({ data }) {
   return (
     <div className={styles.container}>
       <Head>
@@ -81,4 +77,11 @@ export default function Home() {
       </footer>
     </div>
   )
+}
+
+export async function getStaticProps({ preview = false }) {
+  const { data } = await client.query({ query: GET_POSTS })
+  return {
+    props: { data, preview },
+  }
 }
