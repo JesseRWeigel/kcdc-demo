@@ -1,6 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 
 const GET_POSTS = gql`
@@ -14,14 +15,18 @@ const GET_POSTS = gql`
             node {
               firstName
               lastName
+              avatar {
+                url
+              }
             }
           }
-          excerpt(format: RAW)
+          excerpt(format: RENDERED)
           slug
           content(format: RENDERED)
           featuredImage {
             node {
-              uri
+              title
+              sourceUrl
             }
           }
         }
@@ -55,13 +60,14 @@ export default function Home() {
 
           <div className={styles.grid}>
             {data?.posts?.edges?.map((item) => (
-              <div key={item?.node?.id} className={styles.card}>
-                {/* Make this a link to the single post page */}
-                <h2>{item?.node?.title}</h2>
-                <p
-                  dangerouslySetInnerHTML={{ __html: item?.node?.content }}
-                ></p>
-              </div>
+              <Link href={`/post/${item?.node?.slug}`} key={item?.node?.id}>
+                <div className={styles.card}>
+                  <h2>{item?.node?.title}</h2>
+                  <p
+                    dangerouslySetInnerHTML={{ __html: item?.node?.content }}
+                  ></p>
+                </div>
+              </Link>
             ))}
           </div>
         </main>
