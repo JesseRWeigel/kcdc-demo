@@ -40,12 +40,6 @@ export default function Home() {
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :(</p>
 
-  const useEffect = () => (
-    () => {
-      console.log(data)
-    },
-    [data]
-  )
   return (
     <div className={styles.container}>
       <Head>
@@ -65,7 +59,7 @@ export default function Home() {
                   <h2>{item?.node?.title}</h2>
                   <p
                     dangerouslySetInnerHTML={{ __html: item?.node?.content }}
-                  ></p>
+                  />
                 </div>
               </Link>
             ))}
